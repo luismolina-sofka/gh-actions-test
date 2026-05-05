@@ -1,0 +1,31 @@
+name: QA Automation Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  ui-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Playwright Browsers
+        run: mvn exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install"
+
+      - name: Run UI Tests
+        run: mvn test
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui-test-report
+          path: target/surefire-reports/
